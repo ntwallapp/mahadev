@@ -13,19 +13,21 @@ jobs:
       contents: write
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Rename to next number
         run: |
-          existing=$(ls [0-9]*.webp 2>/dev/null | sed 's/.webp//' | sort -n)
-          
           get_next() {
             n=1
-            while echo "$existing" | grep -q "^$n$"; do
+            while [ -f "${n}.webp" ] || echo "$used" | grep -q "^$n$"; do
               n=$((n + 1))
             done
-            existing="$existing"$'\n'"$n"
+            used="$used"$'\n'"$n"
             echo $n
           }
+          
+          used=""
           
           for f in *.webp; do
             if [[ "$f" != [0-9]*.webp ]]; then
